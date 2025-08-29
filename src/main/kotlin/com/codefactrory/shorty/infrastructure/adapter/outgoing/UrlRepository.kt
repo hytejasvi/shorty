@@ -23,8 +23,17 @@ class UrlRepository(
         }
     }
 
-    override fun findByShortUrlCode(shortUrlCode: String) {
-        TODO("Not yet implemented")
+    override fun findByShortUrlCode(shortUrlCode: String): UrlMapping {
+        return try {
+            urlJpaRepository.findByShortUrlCode(shortUrlCode)
+                ?: throw UrlRepositoryPortNotFoundError("Not found by short coe: $shortUrlCode")
+        } catch (e: Exception) {
+            if (e is UrlRepositoryPortNotFoundError) throw e
+            throw UrlRepositoryPortUnexpectedError(
+                "Unexpected error while fetching URL mapping for short code: $shortUrlCode",
+                e
+            )
+        }
     }
 
     override fun findByOriginalUrl(originalUrl: String): UrlMapping {

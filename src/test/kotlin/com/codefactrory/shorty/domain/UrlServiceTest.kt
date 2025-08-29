@@ -11,79 +11,110 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.times
 
 class UrlServiceTest {
 
-    private val DEFAULT_ORIGINAL_URL = "https://www.dkbcodefactory.com/"
-    private lateinit var mockPort: UrlRepositoryPort
-    private lateinit var service: UrlService
+        companion object {
+                private const val BASE_URL = "http://localhost:8080"
+                private const val DEFAULT_ORIGINAL_URL = "https://www.dkbcodefactory.com/"
+                private const val SHORT_CODE = "abc123"
+            }
 
-    @BeforeEach
-    fun setup() {
-        mockPort = mock(UrlRepositoryPort::class.java)
-        service = UrlService(
-            mockPort,
-            "http://localhost:8080",
-            6
-        )
-    }
+        private lateinit var mockPort: UrlRepositoryPort
+        private lateinit var service: UrlService
 
-    @Test
-    fun `should return new short url when original not found`() {
-        val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
+        @BeforeEach
+        fun setup() {
+                mockPort = mock(UrlRepositoryPort::class.java)
+                service = UrlService(
+                    mockPort,
+                    BASE_URL,
+                    6
+                )
+            }
 
-        `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
-            .thenThrow(UrlRepositoryPortNotFoundError("Not found by Original Url: $DEFAULT_ORIGINAL_URL"))
+        @Test
+        fun `should return new short url when original not found`() {
+                val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
 
-        mockSaveBehavior()
+                `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
+                    .thenThrow(UrlRepositoryPortNotFoundError("Not found by Original Url: $DEFAULT_ORIGINAL_URL"))
 
-        val result = service.createShortUrl(request)
+                mockSaveBehavior()
 
-        assertEquals(DEFAULT_ORIGINAL_URL, result.originalUrl)
-        assertTrue(result.shortUrl.startsWith("http://localhost:8080"))
-        verify(mockPort, times(2)).save(any())
-    }
+                val result = service.createShortUrl(request)
 
-    @Test
-    fun `should return existing short url when original already exists`() {
-        val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
-        val existingMapping = UrlMapping(
-            id = 1L,
-            originalUrl = DEFAULT_ORIGINAL_URL,
-            shortUrlCode = "abc123"
-        )
+                assertEquals(DEFAULT_ORIGINAL_URL, result.originalUrl)
+                assertTrue(result.shortUrl.startsWith(BASE_URL))
+                verify(mockPort, times(2)).save(any())
+            }
 
-        `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
-            .thenReturn(existingMapping)
+        @Test
+        fun `should return existing short url when original already exists`() {
+                val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
+                val existingMapping = UrlMapping(
+                    id = 1L,
+                    originalUrl = DEFAULT_ORIGINAL_URL,
+                    shortUrlCode = SHORT_CODE
+                )
 
-        val result = service.createShortUrl(request)
+                `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
+                    .thenReturn(existingMapping)
 
-        assertEquals(DEFAULT_ORIGINAL_URL, result.originalUrl)
-        assertEquals("http://localhost:8080/abc123", result.shortUrl)
-        verify(mockPort, never()).save(any()) // no save because already exists
-    }
+                val result = service.createShortUrl(request)
 
-    @Test
-    fun `should propagate unexpected repository error`() {
-        val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
+                assertEquals(DEFAULT_ORIGINAL_URL, result.originalUrl)
+                assertEquals("$BASE_URL/$SHORT_CODE", result.shortUrl)
+                verify(mockPort, never()).save(any()) // no save because already exists
+            }
 
-        `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
-            .thenThrow(UrlRepositoryPortError.UrlRepositoryPortUnexpectedError("DB failure"))
+        @Test
+        fun `should propagate unexpected repository error`() {
+                val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
 
-        val ex = assertThrows(UrlRepositoryPortError.UrlRepositoryPortUnexpectedError::class.java) {
-            service.createShortUrl(request)
-        }
+                `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
+                    .thenThrow(UrlRepositoryPortError.UrlRepositoryPortUnexpectedError("DB failure"))
 
-        assertEquals("DB failure", ex.message)
-    }
+                val ex = assertThrows(UrlRepositoryPortError.UrlRepositoryPortUnexpectedError::class.java) {
+                        service.createShortUrl(request)
+                    }
 
-    private fun mockSaveBehavior() {
-        `when`(mockPort.save(any())).thenAnswer { invocation ->
-            val mapping = invocation.getArgument<UrlMapping>(0)
-            mapping.id = mapping.id ?: 1L
-            mapping
-        }
-    }
+                assertEquals("DB failure", ex.message)
+            }
+
+        @Test
+        fun `should return original url when short code exists`() {
+                val mapping = UrlMapping(
+                    id = 1L,
+                    originalUrl = DEFAULT_ORIGINAL_URL,
+                    shortUrlCode = SHORT_CODE
+                )
+
+                `when`(mockPort.findByShortUrlCode(SHORT_CODE))
+                    .thenReturn(mapping)
+
+                val result = service.getOriginalUrl(SHORT_CODE)
+
+                assertEquals(DEFAULT_ORIGINAL_URL, result)
+            }
+
+        @Test
+        fun `should throw not found error when short code does not exist`() {
+                `when`(mockPort.findByShortUrlCode(SHORT_CODE))
+                    .thenThrow(UrlRepositoryPortNotFoundError("Not found by short code: $SHORT_CODE"))
+
+                val ex = assertThrows(UrlRepositoryPortNotFoundError::class.java) {
+                        service.getOriginalUrl(SHORT_CODE)
+                    }
+
+                assertEquals("Not found by short code: $SHORT_CODE", ex.message)
+            }
+
+        private fun mockSaveBehavior() {
+                `when`(mockPort.save(any())).thenAnswer { invocation ->
+                        val mapping = invocation.getArgument<UrlMapping>(0)
+                        mapping.id = mapping.id ?: 1L
+                        mapping
+                    }
+            }
 }

@@ -37,6 +37,13 @@ class UrlService(
         return urlResponse
     }
 
+    fun getOriginalUrl(
+        shortUrlCode: String
+    ): String {
+        val urlMapping = urlRepositoryPort.findByShortUrlCode(shortUrlCode)
+        return urlMapping.originalUrl
+    }
+
     private fun generateNewShortUrlCode(
         originalUrl: String
     ): String {
