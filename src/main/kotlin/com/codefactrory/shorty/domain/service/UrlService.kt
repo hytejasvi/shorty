@@ -1,5 +1,7 @@
 package com.codefactrory.shorty.domain.service
 
+import com.codefactrory.shorty.domain.common.Base62Encoder
+import com.codefactrory.shorty.domain.common.UrlNormalizer
 import com.codefactrory.shorty.domain.model.UrlMapping
 import com.codefactrory.shorty.domain.port.UrlRepositoryPort
 import com.codefactrory.shorty.domain.port.UrlRepositoryPortError
@@ -7,32 +9,30 @@ import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlRequestDto
 import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlResponseDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UrlService(
-    val urlRepositoryPort: UrlRepositoryPort
+    val urlRepositoryPort: UrlRepositoryPort,
+    @Value("\${shorty.base-url}") private val baseUrl: String,
+    @Value("\${shorty.min-short-code-length}") private val minShortCodeLength: Int
 ) {
 
-    private val BASE62 =  "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-    @Value("\${shorty.base-url}")
-    lateinit var baseUrl: String
-
-    @Value("\${shorty.min-short-code-length}")
-    private var minShortCodeLength: Int = 6
-
-
-    fun createShortUrl(urlRequestDto: UrlRequestDto): UrlResponseDto {
+    @Transactional
+    fun createShortUrl(
+        urlRequestDto: UrlRequestDto
+    ): UrlResponseDto {
+        val normalizedUrl = UrlNormalizer.normalizeAndValidate(urlRequestDto.originalUrl)
         val shortCode =
             try {
-                val existingMapping = urlRepositoryPort.findByOriginalUrl(urlRequestDto.originalUrl)
+                val existingMapping = urlRepositoryPort.findByOriginalUrl(normalizedUrl)
                 existingMapping.shortUrlCode
             } catch(e:UrlRepositoryPortError.UrlRepositoryPortNotFoundError) {
-                generateNewShortUrlCode(urlRequestDto.originalUrl)
+                generateNewShortUrlCode(normalizedUrl)
             }
         val urlResponse = UrlResponseDto(
-            originalUrl = urlRequestDto.originalUrl,
-            shortUrl = shortCode,
+            originalUrl = normalizedUrl,
+            shortUrl = "$baseUrl/$shortCode"
         )
         return urlResponse
     }
@@ -47,24 +47,13 @@ class UrlService(
                 )
         )
         val obfuscatedNumber = obfuscatedId(savedMapping.id!!)
-        val shortUrlCode = base62EncodeWithMinLength(obfuscatedNumber, minShortCodeLength)
-        savedMapping.shortUrlCode = shortUrlCode
-        urlRepositoryPort.save(savedMapping)
-        return shortUrlCode
-    }
+        val shortUrlCode = Base62Encoder.encode(obfuscatedNumber, minShortCodeLength)
 
-    fun base62EncodeWithMinLength(number: Long, minLength: Int): String
-    { var n = number
-        val sb = StringBuilder()
-        do {
-            val rem = (n % 62).toInt()
-            sb.append(BASE62[rem])
-            n /= 62
-        } while (n > 0)
-     while (sb.length < minLength) {
-         sb.append('0')
-     }
-        return sb.reverse().toString()
+        savedMapping.shortUrlCode = shortUrlCode
+
+        urlRepositoryPort.save(savedMapping)
+
+        return shortUrlCode
     }
 
     private fun obfuscatedId(id: Long): Long = (id * 12345) + 98765

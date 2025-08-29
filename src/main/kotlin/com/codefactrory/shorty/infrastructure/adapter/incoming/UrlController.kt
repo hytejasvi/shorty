@@ -29,7 +29,6 @@ class UrlController(
 
 data class UrlRequestDto(
     @field:NotBlank(message= "Url should not be blank")
-    @URL(message = "Invalid URL Format")
     val originalUrl: String
 )
 
