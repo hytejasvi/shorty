@@ -13,6 +13,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-shorty:
-  base-url: http://localhost:8080  # for dev
-  min-short-code-length: 6

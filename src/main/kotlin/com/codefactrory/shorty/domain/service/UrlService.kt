@@ -7,15 +7,14 @@ import com.codefactrory.shorty.domain.port.UrlRepositoryPort
 import com.codefactrory.shorty.domain.port.UrlRepositoryPortError
 import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlRequestDto
 import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlResponseDto
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UrlService(
     val urlRepositoryPort: UrlRepositoryPort,
-    @Value("\${shorty.base-url}") private val baseUrl: String,
-    @Value("\${shorty.min-short-code-length}") private val minShortCodeLength: Int
+    private val baseUrl: String = "http://localhost:8080",
+    private val minShortCodeLength: Int = 6
 ) {
 
     @Transactional
