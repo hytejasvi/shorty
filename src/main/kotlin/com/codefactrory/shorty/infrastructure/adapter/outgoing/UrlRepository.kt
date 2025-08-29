@@ -26,7 +26,7 @@ class UrlRepository(
     override fun findByShortUrlCode(shortUrlCode: String): UrlMapping {
         return try {
             urlJpaRepository.findByShortUrlCode(shortUrlCode)
-                ?: throw UrlRepositoryPortNotFoundError("Not found by short coe: $shortUrlCode")
+                ?: throw UrlRepositoryPortNotFoundError("Not found url: $shortUrlCode")
         } catch (e: Exception) {
             if (e is UrlRepositoryPortNotFoundError) throw e
             throw UrlRepositoryPortUnexpectedError(
@@ -39,7 +39,7 @@ class UrlRepository(
     override fun findByOriginalUrl(originalUrl: String): UrlMapping {
         return try {
             urlJpaRepository.findByOriginalUrl(originalUrl)
-                ?: throw UrlRepositoryPortNotFoundError("Not found by Original Url: $originalUrl")
+                ?: throw UrlRepositoryPortNotFoundError("Not found Url: $originalUrl")
         } catch (e: Exception) {
             if (e is UrlRepositoryPortNotFoundError) throw e
             throw UrlRepositoryPortUnexpectedError(

@@ -39,6 +39,14 @@ class UrlController(
             .location(URI.create(originalUrl))
             .build()
     }
+
+    @GetMapping("/original/{shortUrlCode}")
+    fun getOriginalUrl(
+        @PathVariable shortUrlCode: String
+    ): ResponseEntity<String> {
+        val originalUrl = urlService.getOriginalUrl(shortUrlCode)
+        return ResponseEntity.status(HttpStatus.OK).body(originalUrl)
+    }
 }
 
 data class UrlRequestDto(
