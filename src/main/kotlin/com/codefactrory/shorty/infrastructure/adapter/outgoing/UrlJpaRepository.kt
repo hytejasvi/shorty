@@ -7,5 +7,5 @@ interface UrlJpaRepository: JpaRepository<UrlMapping, Long> {
 
     fun findByShortUrlCode(shortUrlCode: String)
 
-    fun findByOriginalUrl(originalUrl: String)
+    fun findByOriginalUrl(originalUrl: String): UrlMapping?
 }
