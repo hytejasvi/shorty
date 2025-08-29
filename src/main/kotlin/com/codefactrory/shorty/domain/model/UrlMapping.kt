@@ -5,7 +5,7 @@ import java.time.Instant
 
 @Entity
 @Table(name = "url")
-class UrlMapping (
+data class UrlMapping (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
