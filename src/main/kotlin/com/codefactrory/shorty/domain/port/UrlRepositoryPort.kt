@@ -6,7 +6,7 @@ interface UrlRepositoryPort {
 
     fun save(urlMapping: UrlMapping): UrlMapping
 
-    fun findByShortUrlCode(shortUrlCode: String)
+    fun findByShortUrlCode(shortUrlCode: String): UrlMapping
 
     fun findByOriginalUrl(originalUrl: String): UrlMapping
 }
