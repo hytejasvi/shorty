@@ -20,6 +20,8 @@ Shorty is a minimalistic URL shortening service. It allows users to convert long
   - Global exception handling via `@RestControllerAdvice`.
   - Unit and integration tests for core functionality.
   - Configurable `baseUrl` and minimum short code length.
+  - Note: Currently, short codes are generated using database auto-increment IDs (GenerationType.IDENTITY) for simplicity.
+  - In a production environment, alternative strategies such as UUID/ULID encoding or distributed ID generators would be preferable to ensure scalability, global uniqueness, and reduced DB writes.
 
 ## Build & Run Instructions
 
@@ -80,12 +82,15 @@ HTTP 302 redirect to the original URL.
 ## Configurations
 
 ```
-| Property             | Description                               | Default Value          |
+| Property             | Description                               | Default Value         |
 |----------------------|-------------------------------------------|-----------------------|
 | `baseUrl`            | Base URL for generated short URLs         | http://localhost:8080 |
 | `minShortCodeLength` | Minimum length for generated short codes  | 6                     |
 
 ```
+**Note**: 
+- Configurable properties are currently hardcoded for simplicity.
+- In a production setup, these should be externalized using environment variables or application.yaml for flexibility, maintainability, and security.
 
 ## Testing
 
@@ -101,10 +106,12 @@ HTTP 302 redirect to the original URL.
 - Add metrics and monitoring for short URL usage.
 - Introduce a caching layer for faster lookups.
 - Add Swagger/OpenAPI documentation for the APIs.
+- Explore alternative ID strategies (UUID/ULID, distributed generators) for scalable deployments.
 
 ## Scalability Considerations
 
-While this project is designed at personal level, several areas can be improved for scalability in real-world deployments:
+- This section highlights potential improvements and trade-offs if this service were deployed in a production environment.
+- While the current implementation works well for MVP, these considerations reflect a production-ready mindset.
 
 ### 1. Database Writes
 Currently, short codes are generated using the auto-incremented database ID (`GenerationType.IDENTITY`). This requires:
