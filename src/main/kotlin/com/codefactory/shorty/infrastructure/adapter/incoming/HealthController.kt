@@ -1,4 +1,4 @@
-package com.codefactrory.shorty.infrastructure.adapter.incoming
+package com.codefactory.shorty.infrastructure.adapter.incoming
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

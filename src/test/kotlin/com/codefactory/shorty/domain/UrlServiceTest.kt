@@ -1,11 +1,11 @@
-package com.codefactrory.shorty.domain
+package com.codefactory.shorty.domain
 
-import com.codefactrory.shorty.domain.model.UrlMapping
-import com.codefactrory.shorty.domain.port.UrlRepositoryPort
-import com.codefactrory.shorty.domain.port.UrlRepositoryPortError
-import com.codefactrory.shorty.domain.port.UrlRepositoryPortError.UrlRepositoryPortNotFoundError
-import com.codefactrory.shorty.domain.service.UrlService
-import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlRequestDto
+import com.codefactory.shorty.domain.model.UrlMapping
+import com.codefactory.shorty.domain.port.UrlRepositoryPort
+import com.codefactory.shorty.domain.port.UrlRepositoryPortError
+import com.codefactory.shorty.domain.port.UrlRepositoryPortError.UrlRepositoryPortNotFoundError
+import com.codefactory.shorty.application.service.UrlService
+import com.codefactory.shorty.infrastructure.adapter.incoming.UrlRequestDto
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,7 +32,7 @@ class UrlServiceTest {
         val request = UrlRequestDto(DEFAULT_ORIGINAL_URL)
 
         `when`(mockPort.findByOriginalUrl(DEFAULT_ORIGINAL_URL))
-            .thenThrow(UrlRepositoryPortNotFoundError("Not found by Original Url: $DEFAULT_ORIGINAL_URL"))
+            .thenThrow(UrlRepositoryPortNotFoundError("Short code not found for Url: $DEFAULT_ORIGINAL_URL"))
 
         mockSaveBehavior()
 
@@ -59,7 +59,7 @@ class UrlServiceTest {
 
         assertEquals(DEFAULT_ORIGINAL_URL, result.originalUrl)
         assertEquals("$BASE_URL/$SHORT_CODE", result.shortUrl)
-        verify(mockPort, never()).save(any()) // no save because already exists
+        verify(mockPort, never()).save(any())
     }
 
     @Test
@@ -95,13 +95,13 @@ class UrlServiceTest {
     @Test
     fun `should throw not found error when short code does not exist`() {
         `when`(mockPort.findByShortUrlCode(SHORT_CODE))
-            .thenThrow(UrlRepositoryPortNotFoundError("Not found by short code: $SHORT_CODE"))
+            .thenThrow(UrlRepositoryPortNotFoundError("Actual url not found for short code: $SHORT_CODE"))
 
         val ex = assertThrows(UrlRepositoryPortNotFoundError::class.java) {
             service.getOriginalUrl(SHORT_CODE)
         }
 
-        assertEquals("Not found by short code: $SHORT_CODE", ex.message)
+        assertEquals("Actual url not found for short code: $SHORT_CODE", ex.message)
     }
 
     private fun mockSaveBehavior() {
@@ -131,12 +131,33 @@ class UrlServiceTest {
             "http://example.com" to "http://example.com",
             "https://example.com/path" to "https://example.com/path"
         )
+
         for ((input, expected) in validUrls) {
             `when`(mockPort.findByOriginalUrl(expected))
                 .thenThrow(UrlRepositoryPortNotFoundError("Not found"))
+
             mockSaveBehavior()
+
             val result = service.createShortUrl(UrlRequestDto(input))
+
             assertEquals(expected, result.originalUrl)
+        }
+    }
+
+    @Test
+    fun `should throw IllegalArgumentException for URLs with special characters`() {
+        val invalidUrls = listOf(
+            "https://example.com/<>",
+            "https://example.com/|",
+            "https://example.com/space test"
+        )
+
+        for (url in invalidUrls) {
+            val request = UrlRequestDto(url)
+            val ex = assertThrows(IllegalArgumentException::class.java) {
+                service.createShortUrl(request)
+            }
+            assertTrue(ex.message!!.contains("Invalid URL"))
         }
     }
 

@@ -1,6 +1,6 @@
-package com.codefactrory.shorty.infrastructure.adapter.incoming
+package com.codefactory.shorty.infrastructure.adapter.incoming
 
-import com.codefactrory.shorty.domain.service.UrlService
+import com.codefactory.shorty.application.service.UrlService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.URL

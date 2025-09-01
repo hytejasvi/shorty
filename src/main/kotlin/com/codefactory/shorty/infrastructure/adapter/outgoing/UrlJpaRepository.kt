@@ -1,6 +1,6 @@
-package com.codefactrory.shorty.infrastructure.adapter.outgoing
+package com.codefactory.shorty.infrastructure.adapter.outgoing
 
-import com.codefactrory.shorty.domain.model.UrlMapping
+import com.codefactory.shorty.domain.model.UrlMapping
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UrlJpaRepository: JpaRepository<UrlMapping, Long> {

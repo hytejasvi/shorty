@@ -1,4 +1,4 @@
-package com.codefactrory.shorty.domain.model
+package com.codefactory.shorty.domain.model
 
 import jakarta.persistence.*
 import java.time.Instant

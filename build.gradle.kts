@@ -40,6 +40,7 @@ dependencies {
 
 	// Utils
 	implementation("commons-validator:commons-validator:1.7")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
 	// Tests

@@ -1,4 +1,4 @@
-package com.codefactrory.shorty
+package com.codefactory.shorty
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

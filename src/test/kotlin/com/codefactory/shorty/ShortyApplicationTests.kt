@@ -1,4 +1,4 @@
-package com.codefactrory.shorty
+package com.codefactory.shorty
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

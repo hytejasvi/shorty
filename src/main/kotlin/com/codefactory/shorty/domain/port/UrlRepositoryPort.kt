@@ -1,6 +1,6 @@
-package com.codefactrory.shorty.domain.port
+package com.codefactory.shorty.domain.port
 
-import com.codefactrory.shorty.domain.model.UrlMapping
+import com.codefactory.shorty.domain.model.UrlMapping
 
 interface UrlRepositoryPort {
 

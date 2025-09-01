@@ -1,12 +1,12 @@
-package com.codefactrory.shorty.domain.service
+package com.codefactory.shorty.application.service
 
-import com.codefactrory.shorty.domain.common.Base62Encoder
-import com.codefactrory.shorty.domain.common.UrlNormalizer
-import com.codefactrory.shorty.domain.model.UrlMapping
-import com.codefactrory.shorty.domain.port.UrlRepositoryPort
-import com.codefactrory.shorty.domain.port.UrlRepositoryPortError
-import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlRequestDto
-import com.codefactrory.shorty.infrastructure.adapter.incoming.UrlResponseDto
+import com.codefactory.shorty.domain.common.Base62Encoder
+import com.codefactory.shorty.domain.common.UrlNormalizer
+import com.codefactory.shorty.domain.model.UrlMapping
+import com.codefactory.shorty.domain.port.UrlRepositoryPort
+import com.codefactory.shorty.domain.port.UrlRepositoryPortError
+import com.codefactory.shorty.infrastructure.adapter.incoming.UrlRequestDto
+import com.codefactory.shorty.infrastructure.adapter.incoming.UrlResponseDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

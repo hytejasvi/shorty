@@ -1,4 +1,4 @@
-package com.codefactrory.shorty.domain.common
+package com.codefactory.shorty.domain.common
 
 import org.apache.commons.validator.routines.UrlValidator
 
@@ -17,7 +17,7 @@ object UrlNormalizer {
         }
 
         if (!urlValidator.isValid(fullUrl)) {
-            throw IllegalArgumentException("Invalid URL: $fullUrl")
+            throw IllegalArgumentException("Invalid URL format: $fullUrl")
         }
 
         return fullUrl

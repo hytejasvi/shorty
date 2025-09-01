@@ -1,4 +1,4 @@
-package com.codefactrory.shorty.domain.common
+package com.codefactory.shorty.domain.common
 
 object Base62Encoder {
     private const val BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
