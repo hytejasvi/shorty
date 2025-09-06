@@ -21,9 +21,9 @@ repositories {
 }
 
 dependencies {
-	// Arrow: functional programming library for Kotlin
-	//implementation(platform("io.arrow-kt:arrow-stack:1.2.4"))
-	//implementation("io.arrow-kt:arrow-core")
+
+	implementation(platform("io.arrow-kt:arrow-stack:1.2.4"))
+	implementation("io.arrow-kt:arrow-core")
 
 	// Spring Boot starters
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
